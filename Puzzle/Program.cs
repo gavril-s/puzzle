@@ -9,9 +9,20 @@ namespace Puzzle
 {
     internal static class Program
     {
+        // начальный экран, на котором можно
+        // выбрать изображение и задать
+        // размеры пазла
         private static StartForm startForm;
+
+        // игровое поле, где пользователь
+        // собирает пазл
         private static GameForm gameForm;
+
+        // экран, сообщающий о том, что пазл
+        // собран, то есть игра закончена
         private static GameEndForm gameEndForm;
+
+        // "справка" или статистика игры
         private static GameStatsForm gameStatsForm;
 
         public static StartForm getStartForm()
@@ -69,6 +80,7 @@ namespace Puzzle
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            // Создаём и запускаем начальную "форму"
             startForm = getStartForm();
             Application.Run(startForm);
         }

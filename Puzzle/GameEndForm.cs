@@ -41,11 +41,13 @@ namespace Puzzle
 
         private void statsButton_onClick(object sender, EventArgs e)
         {
+            // "Справка" или статистика
             Program.getGameStatsForm(seconds, clicks, pieces).Show();
         }
 
         private void newGameButton_onClick(object sender, EventArgs e)
         {
+            // "Новая игра"
             this.Close();
         }
     }

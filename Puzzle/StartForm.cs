@@ -42,6 +42,12 @@ namespace Puzzle
 
         private void selectImageButton_onClick(object sender, EventArgs e)
         {
+            /*
+             * Вызывается при нажатии кнопки
+             * "Выбрать изображение"
+             * Открывает соответствующий диалог
+            */
+
             OpenFileDialog open = new OpenFileDialog();
             open.Filter = "Image Files(*.jpg; *.jpeg; *.png; *.gif; *.bmp)|*.jpg; *.jpeg; *.png; *.gif; *.bmp";
             if (open.ShowDialog() == DialogResult.OK)
@@ -54,6 +60,14 @@ namespace Puzzle
 
         private void runGameButton_onClick(object sender, EventArgs e)
         {
+            /*
+             * Вызывается при нажатии кнопки
+             * "Начать"
+             * Начинает игру, если пользователь
+             * загрузил изображение
+             * и задал корректные размеры пазла
+            */
+
             if (imageBox.Image == null)
             {
                 return;
@@ -74,6 +88,12 @@ namespace Puzzle
 
         private int? getIntFromTextBox(TextBox tx)
         {
+            /*
+             * Достаёт int из TextBox.
+             * В случае неудачи возвращает
+             * null
+            */
+
             if (tx == null || tx.Text == "")
             {
                 return null;

@@ -21,7 +21,8 @@ namespace Puzzle
         public StartForm()
         {
             InitializeComponent();
-            destroyed = false;
+            destroyed = false; 
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
             imageBox.AllowDrop = true;
             selectImageButton.Click += selectImageButton_onClick;
             runGameButton.Click += runGameButton_onClick;

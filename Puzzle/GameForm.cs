@@ -47,15 +47,17 @@ namespace Puzzle
             ImageHeight = puzzleGridPanel.Height;
 
             this.MouseMove += mouseMoveHandler;
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
 
-            for (int row = 0; row < cellsHorizontal; row++)
+            for (int row = 0; row < cellsVertical; row++)
             {
-                for (int column = 0; column < cellsVertical; column++)
+                for (int column = 0; column < cellsHorizontal; column++)
                 {
                     Point location = new Point(column * (ImageWidth / cellsHorizontal), 
                                                row * (ImageHeight / cellsVertical));
 
                     puzzleGrid[column, row] = newPiece(location);
+                    puzzleGrid[column, row].BorderStyle = BorderStyle.FixedSingle;
                     puzzleGridPanel.Controls.Add(puzzleGrid[column, row]);
 
                     piecesGrid[column, row] = newPiece(location);
@@ -82,21 +84,6 @@ namespace Puzzle
             piece.MouseMove += mouseMoveHandler;
 
             return piece;
-        }
-
-        protected override void OnPaint(PaintEventArgs pe)
-        {
-            Graphics g = puzzleGridPanel.CreateGraphics();
-            base.OnPaint(pe);
-            for (int x = 0; x < puzzleGridPanel.Width; x += (ImageWidth / cellsVertical))
-            {
-                g.DrawLine(Pens.Black, x, 0, x, puzzleGridPanel.Height);
-            }
-
-            for (int y = 0; y < puzzleGridPanel.Height; y += (ImageHeight / cellsVertical))
-            {
-                g.DrawLine(Pens.Black, 0, y, puzzleGridPanel.Width, y);
-            }
         }
 
         public bool IsDestroyed()
@@ -141,7 +128,7 @@ namespace Puzzle
                     }
 
                     piecesGrid[rand_column, rand_row].Image = piece;
-                    piecesGrid[rand_column, rand_row].Tag = new Point(column * width, row * height);
+                    piecesGrid[rand_column, rand_row].Tag = new Point(column, row);
 
                     sourceRect.X += width;
                 }
@@ -179,15 +166,15 @@ namespace Puzzle
         private void dragDropHandler(object sender, DragEventArgs e)
         {
             Point? nearestCell = null;
-
             Point selectedPictureLocation = puzzleGridPanel.PointToClient(System.Windows.Forms.Control.MousePosition);
-            Point correction = new Point((ImageWidth / cellsHorizontal) / 2, (ImageHeight / cellsVertical) / 2);
-            selectedPictureLocation.X -= correction.X;
-            selectedPictureLocation.Y -= correction.Y;
-
+           
             if (selectedPictureLocation.X >= 0 && selectedPictureLocation.X <= puzzleGridPanel.Width &&
                 selectedPictureLocation.Y >= 0 && selectedPictureLocation.Y <= puzzleGridPanel.Height)
             {
+                Point correction = new Point((ImageWidth / cellsHorizontal) / 2, (ImageHeight / cellsVertical) / 2);
+                selectedPictureLocation.X -= correction.X;
+                selectedPictureLocation.Y -= correction.Y;
+
                 for (int row = 0; row < cellsHorizontal; row++)
                 {
                     for (int column = 0; column < cellsVertical; column++)
@@ -195,7 +182,8 @@ namespace Puzzle
                         Point p = new Point(column * selectedPicture.Width, row * selectedPicture.Height);
                         if (nearestCell == null ||
                             Math.Pow(p.X - selectedPictureLocation.X, 2) + Math.Pow(p.Y - selectedPictureLocation.Y, 2) <
-                            Math.Pow(((Point)nearestCell).X - selectedPictureLocation.X, 2) + Math.Pow(((Point)nearestCell).Y - selectedPictureLocation.Y, 2))
+                            Math.Pow(((Point)nearestCell).X - selectedPictureLocation.X, 2) +
+                            Math.Pow(((Point)nearestCell).Y - selectedPictureLocation.Y, 2))
                         {
                             nearestCell = p;
                         }   
@@ -208,10 +196,13 @@ namespace Puzzle
                 if (selectedPicture.Image != null)
                 {
                     Image puzzleImage = puzzleGrid[x, y].Image;
+                    object puzzleTag = puzzleGrid[x, y].Tag;
+
                     puzzleGrid[x, y].Image = new Bitmap(selectedPicture.Image);
                     puzzleGrid[x, y].Tag = selectedPicture.Tag;
+                    Console.WriteLine(puzzleGrid[x, y].Tag);
                     selectedPicture.Image = (puzzleImage == null ? null : new Bitmap(puzzleImage));
-                    selectedPicture.Tag = (puzzleImage == null ? null : puzzleImage.Tag);
+                    selectedPicture.Tag = puzzleTag;
                     returnSelectedTo.Controls.Add(selectedPicture);
                 }
                 returnSelectedTo = null;
@@ -240,9 +231,19 @@ namespace Puzzle
             {
                 for (int row = 0; row < cellsVertical; row++)
                 {
+                    /*Console.WriteLine();
+                    if (puzzleGrid[column, row].Tag != null)
+                    {
+                        Console.Write(column);
+                        Console.Write(row);
+                        Console.Write(" ");
+                        Console.Write(((Point)puzzleGrid[column, row].Tag).X.ToString());
+                        Console.Write(((Point)puzzleGrid[column, row].Tag).Y.ToString());
+                    }*/
+
                     if (puzzleGrid[column, row] == null ||
                         puzzleGrid[column, row].Tag == null ||
-                        puzzleGrid[column, row].Location != (Point)puzzleGrid[column, row].Tag)
+                        new Point(column, row) != (Point)puzzleGrid[column, row].Tag)
                     {
                         return false;
                     }

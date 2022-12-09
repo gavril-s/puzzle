@@ -12,10 +12,20 @@ namespace Puzzle
 {
     public partial class GameEndForm : Form
     {
+        private int seconds;
+        private int clicks;
+        private int pieces;
         bool destroyed = false;
-        public GameEndForm()
+        
+        public GameEndForm(int seconds, int clicks, int pieces)
         {
             InitializeComponent();
+            this.seconds = seconds;
+            this.clicks = clicks;
+            this.pieces = pieces;
+
+            statsButton.Click += statsButton_onClick;
+            newGameButton.Click += newGameButton_onClick;
         }
 
         public bool IsDestroyed()
@@ -25,8 +35,18 @@ namespace Puzzle
 
         private void onDestroy()
         {
-            Program.getGameForm().Close();
             destroyed = true;
+            Program.getGameForm().Close();
+        }
+
+        private void statsButton_onClick(object sender, EventArgs e)
+        {
+            Program.getGameStatsForm(seconds, clicks, pieces).Show();
+        }
+
+        private void newGameButton_onClick(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

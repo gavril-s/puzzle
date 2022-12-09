@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace Puzzle
     public partial class GameForm : Form
     {
         private bool destroyed;
+        private bool end;
         private int cellsHorizontal;
         private int cellsVertical;
         private Image image;
@@ -22,6 +24,8 @@ namespace Puzzle
         private PictureBox[,] piecesGrid;
         private PictureBox selectedPicture;
         private Panel returnSelectedTo;
+        private Stopwatch stopwatch;
+        private int clicks;
 
         public GameForm()
         {
@@ -29,13 +33,14 @@ namespace Puzzle
             destroyed = false;
         }
 
-        public GameForm(Image img)
+        public GameForm(Image img, int rows, int columns)
         {
             InitializeComponent();
             destroyed = false;
+            end = false;
             image = new Bitmap(img);
-            cellsHorizontal = 2;
-            cellsVertical = 2;
+            cellsHorizontal = columns;
+            cellsVertical = rows;
 
             this.AllowDrop = true;
             puzzleGridPanel.AllowDrop = true;
@@ -66,6 +71,8 @@ namespace Puzzle
             }
 
             fillPiecesGrid();
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
         }
 
         private PictureBox newPiece(Point location)
@@ -73,7 +80,8 @@ namespace Puzzle
             PictureBox piece = new PictureBox();
             piece = new PictureBox();
             piece.SizeMode = PictureBoxSizeMode.StretchImage;
-            piece.Size = new Size(ImageWidth / cellsHorizontal, ImageHeight / cellsVertical);
+            piece.Size = new Size(ImageWidth / cellsHorizontal,
+                                  ImageHeight / cellsVertical);
             piece.AllowDrop = true;
             piece.Location = location;
             piece.Tag = null;
@@ -118,7 +126,6 @@ namespace Puzzle
                         gr.DrawImage(image, destRect, sourceRect, GraphicsUnit.Pixel);
                     }
 
-                    
                     int rand_column = rand.Next(cellsHorizontal);
                     int rand_row = rand.Next(cellsVertical);  
                     while (piecesGrid[rand_column, rand_row].Image != null)
@@ -139,14 +146,24 @@ namespace Puzzle
 
         private void mouseDownHandler(object sender, EventArgs e)
         {
+            if (end)
+            {
+                return;
+            }
+            clicks++;
             selectedPicture = (PictureBox)sender;
-            returnSelectedTo = (piecesGridPanel.Controls.Contains(selectedPicture) ? piecesGridPanel : puzzleGridPanel);
+            returnSelectedTo = (piecesGridPanel.Controls.Contains(selectedPicture) ?
+                                piecesGridPanel : puzzleGridPanel);
             returnSelectedTo.Controls.Remove(selectedPicture);
             selectedPicture.DoDragDrop(selectedPicture, DragDropEffects.All);
         }
 
         private void mouseMoveHandler(object sender, MouseEventArgs e)
         {
+            if (end)
+            {
+                return;
+            }
             if (e.Button == MouseButtons.None && selectedPicture != null)
             {
                 if (returnSelectedTo != null)
@@ -160,28 +177,43 @@ namespace Puzzle
 
         private void dragEnterHandler(object sender, DragEventArgs e)
         {
+            if (end)
+            {
+                return;
+            }
             e.Effect = DragDropEffects.All;
         }
 
         private void dragDropHandler(object sender, DragEventArgs e)
         {
-            Point? nearestCell = null;
-            Point selectedPictureLocation = puzzleGridPanel.PointToClient(System.Windows.Forms.Control.MousePosition);
-           
-            if (selectedPictureLocation.X >= 0 && selectedPictureLocation.X <= puzzleGridPanel.Width &&
-                selectedPictureLocation.Y >= 0 && selectedPictureLocation.Y <= puzzleGridPanel.Height)
+            if (end)
             {
-                Point correction = new Point((ImageWidth / cellsHorizontal) / 2, (ImageHeight / cellsVertical) / 2);
+                return;
+            }
+            Point? nearestCell = null;
+            Point selectedPictureLocation = puzzleGridPanel.PointToClient(
+                System.Windows.Forms.Control.MousePosition);
+           
+            if (selectedPictureLocation.X >= 0 &&
+                selectedPictureLocation.X <= puzzleGridPanel.Width &&
+                selectedPictureLocation.Y >= 0 &&
+                selectedPictureLocation.Y <= puzzleGridPanel.Height)
+            {
+                Point correction = new Point(
+                    (ImageWidth / cellsHorizontal) / 2,
+                    (ImageHeight / cellsVertical) / 2);
                 selectedPictureLocation.X -= correction.X;
                 selectedPictureLocation.Y -= correction.Y;
 
-                for (int row = 0; row < cellsHorizontal; row++)
+                for (int row = 0; row < cellsVertical; row++)
                 {
-                    for (int column = 0; column < cellsVertical; column++)
+                    for (int column = 0; column < cellsHorizontal; column++)
                     {
-                        Point p = new Point(column * selectedPicture.Width, row * selectedPicture.Height);
+                        Point p = new Point(column * selectedPicture.Width,
+                                            row * selectedPicture.Height);
                         if (nearestCell == null ||
-                            Math.Pow(p.X - selectedPictureLocation.X, 2) + Math.Pow(p.Y - selectedPictureLocation.Y, 2) <
+                            Math.Pow(p.X - selectedPictureLocation.X, 2) +
+                            Math.Pow(p.Y - selectedPictureLocation.Y, 2) <
                             Math.Pow(((Point)nearestCell).X - selectedPictureLocation.X, 2) +
                             Math.Pow(((Point)nearestCell).Y - selectedPictureLocation.Y, 2))
                         {
@@ -200,8 +232,8 @@ namespace Puzzle
 
                     puzzleGrid[x, y].Image = new Bitmap(selectedPicture.Image);
                     puzzleGrid[x, y].Tag = selectedPicture.Tag;
-                    Console.WriteLine(puzzleGrid[x, y].Tag);
-                    selectedPicture.Image = (puzzleImage == null ? null : new Bitmap(puzzleImage));
+                    selectedPicture.Image = (puzzleImage == null ? 
+                                             null : new Bitmap(puzzleImage));
                     selectedPicture.Tag = puzzleTag;
                     returnSelectedTo.Controls.Add(selectedPicture);
                 }
@@ -231,16 +263,6 @@ namespace Puzzle
             {
                 for (int row = 0; row < cellsVertical; row++)
                 {
-                    /*Console.WriteLine();
-                    if (puzzleGrid[column, row].Tag != null)
-                    {
-                        Console.Write(column);
-                        Console.Write(row);
-                        Console.Write(" ");
-                        Console.Write(((Point)puzzleGrid[column, row].Tag).X.ToString());
-                        Console.Write(((Point)puzzleGrid[column, row].Tag).Y.ToString());
-                    }*/
-
                     if (puzzleGrid[column, row] == null ||
                         puzzleGrid[column, row].Tag == null ||
                         new Point(column, row) != (Point)puzzleGrid[column, row].Tag)
@@ -255,7 +277,11 @@ namespace Puzzle
 
         private void endGame()
         {
-            Program.getGameEndForm().Show();
+            stopwatch.Stop();
+            end = true;
+            int seconds = (int)(stopwatch.ElapsedMilliseconds / (long)1000);
+            int pieces = cellsHorizontal * cellsVertical;
+            Program.getGameEndForm(seconds, clicks, pieces).Show();
         }
     }
 }

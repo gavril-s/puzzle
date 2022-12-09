@@ -11,6 +11,8 @@ namespace Puzzle
     {
         private static StartForm startForm;
         private static GameForm gameForm;
+        private static GameEndForm gameEndForm;
+        private static GameStatsForm gameStatsForm;
 
         public static StartForm getStartForm()
         {
@@ -21,24 +23,41 @@ namespace Puzzle
             return startForm;
         }
 
-        public static GameForm getGameForm(Image img=null)
+        public static GameForm getGameForm()
         {
-            if (img != null)
-            {
-                gameForm = new GameForm(img);
-            }
+            return gameForm;
+        }
 
-            if (gameForm == null || gameForm.IsDestroyed())
+        public static GameForm getGameForm(Image img, int rows, int columns)
+        {
+            if (gameForm != null)
             {
-                gameForm = new GameForm();
+                gameForm.Dispose();
             }
-
+            gameForm = new GameForm(img, rows, columns);
             return gameForm;
         }
 
         public static GameEndForm getGameEndForm()
         {
-            return new GameEndForm();
+            return gameEndForm;
+        }
+
+        public static GameEndForm getGameEndForm(int sec, int clicks, int pieces)
+        {
+            gameEndForm = new GameEndForm(sec, clicks, pieces);
+            return gameEndForm;
+        }
+
+        public static GameStatsForm getGameStatsForm()
+        {
+            return gameStatsForm;
+        }
+
+        public static GameStatsForm getGameStatsForm(int sec, int clicks, int pieces)
+        {
+            gameStatsForm = new GameStatsForm(sec, clicks, pieces);
+            return gameStatsForm;
         }
 
         /// <summary>

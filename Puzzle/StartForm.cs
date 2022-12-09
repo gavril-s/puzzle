@@ -58,8 +58,36 @@ namespace Puzzle
             {
                 return;
             }
-            Program.getGameForm(imageBox.Image).Show();
+
+            int? rows = getIntFromTextBox(rowsTextBox);
+            int? columns = getIntFromTextBox(columnsTextBox);
+            
+            if (rows == null || columns == null ||
+                (int)rows == 0 || (int)columns == 0)
+            {
+                return;
+            }
+
+            Program.getGameForm(imageBox.Image, (int)rows, (int)columns).Show();
             this.Hide();
+        }
+
+        private int? getIntFromTextBox(TextBox tx)
+        {
+            if (tx == null || tx.Text == "")
+            {
+                return null;
+            }
+
+            try
+            {
+                int res = int.Parse(tx.Text);
+                return res;
+            }
+            catch(Exception)
+            {
+                return null;
+            }
         }
     }
 }

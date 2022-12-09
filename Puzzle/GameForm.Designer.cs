@@ -35,14 +35,14 @@
             // 
             // puzzleGridPanel
             // 
-            this.puzzleGridPanel.Location = new System.Drawing.Point(12, 70);
+            this.puzzleGridPanel.Location = new System.Drawing.Point(12, 30);
             this.puzzleGridPanel.Name = "puzzleGridPanel";
             this.puzzleGridPanel.Size = new System.Drawing.Size(662, 526);
             this.puzzleGridPanel.TabIndex = 1;
             // 
             // piecesGridPanel
             // 
-            this.piecesGridPanel.Location = new System.Drawing.Point(695, 70);
+            this.piecesGridPanel.Location = new System.Drawing.Point(695, 30);
             this.piecesGridPanel.Name = "piecesGridPanel";
             this.piecesGridPanel.Size = new System.Drawing.Size(662, 526);
             this.piecesGridPanel.TabIndex = 2;
@@ -51,11 +51,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1448, 651);
+            this.ClientSize = new System.Drawing.Size(1374, 586);
             this.Controls.Add(this.piecesGridPanel);
             this.Controls.Add(this.puzzleGridPanel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "GameForm";
-            this.Text = "GameForm";
+            this.Text = "Пазл";
             this.ResumeLayout(false);
 
         }
